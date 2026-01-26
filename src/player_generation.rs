@@ -1,4 +1,6 @@
+use csv::{self, ReaderBuilder};
 use rand;
+use serde::Deserialize;
 use std::fs::read_to_string;
 
 use crate::player::{Player, PlayerPosition};
@@ -15,6 +17,13 @@ const MAX_WEIGHT: u16 = 310;
 pub struct PlayerGenerator {
     first_names: Vec<String>,
     last_names: Vec<String>,
+    city_states: Vec<CityState>,
+}
+
+#[derive(Debug, Deserialize)]
+struct CityState {
+    city: String,
+    state_id: String,
 }
 
 impl PlayerGenerator {
@@ -22,6 +31,7 @@ impl PlayerGenerator {
         Self {
             first_names: Self::load_first_names(),
             last_names: Self::load_last_names(),
+            city_states: Self::load_cities(),
         }
     }
 
@@ -41,6 +51,22 @@ impl PlayerGenerator {
             .collect()
     }
 
+    fn load_cities() -> Vec<CityState> {
+        let mut reader = ReaderBuilder::new()
+            .has_headers(true)
+            .from_path("src/data/us_cities/us_cities.csv")
+            .expect("Failed to read US cities file");
+
+        let mut result = Vec::new();
+
+        for record in reader.deserialize::<CityState>() {
+            let record = record.expect("Failed to read city/state record");
+            result.push(record);
+        }
+
+        result
+    }
+
     pub fn generate_player(&mut self, id: u64) -> Player {
         // Name
         let first_name = &self.first_names[rand::random_range(0..self.first_names.len())];
@@ -53,6 +79,8 @@ impl PlayerGenerator {
         let wingspan_inches = height_inches.saturating_add_signed(wingspan_diff);
         let weight_lbs = rand::random_range(MIN_WEIGHT..=MAX_WEIGHT);
 
+        let city_state = &self.city_states[rand::random_range(0..self.city_states.len())];
+
         Player {
             id,
             team_id: None,
@@ -61,8 +89,8 @@ impl PlayerGenerator {
             last_name: last_name.to_string(),
             position: PlayerPosition::PG,
             country: String::from("US"),
-            city: String::from("New York"),
-            state: Some(String::from("NY")),
+            city: city_state.city.to_string(),
+            state: Some(city_state.state_id.to_string()),
             height_inches,
             wingspan_inches,
             weight_lbs,

@@ -1,0 +1,3 @@
+- src/data/first_names.txt: [Link](https://www.cs.cmu.edu/afs/cs/project/ai-repository/ai/areas/nlp/corpora/names/male.txt)
+- src/data/last_names.txt: [Link](https://gist.githubusercontent.com/craigh411/19a4479b289ae6c3f6edb95152214efc/raw/d25a1afd3de42f10abdea7740ed098d41de3c330/List%2520of%2520the%25201,000%2520Most%2520Common%2520Last%2520Names%2520(USA))
+- src/data/us_cities/us_cities.txt [Link](https://simplemaps.com/data/us-cities)
