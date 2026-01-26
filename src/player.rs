@@ -26,4 +26,5 @@ pub struct Player {
     // Measurements
     pub height_inches: u8,
     pub wingspan_inches: u8,
+    pub weight_lbs: u16,
 }
