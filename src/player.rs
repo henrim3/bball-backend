@@ -37,6 +37,7 @@ pub struct Player {
 
     // Measurements
     // TODO: move into separate class, add standing reach, vertical, etc.
+    // shoulder width
     pub height_inches: f32,
     pub wingspan_inches: f32,
     pub weight_lbs: f32,

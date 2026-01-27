@@ -9,8 +9,11 @@ use crate::player::{Player, PlayerPosition};
 const MIN_HEIGHT: f32 = 64.0;
 const MAX_HEIGHT: f32 = 91.0;
 
-const MIN_WINGSPAN_DIFF: f32 = -1.0;
+const MIN_WINGSPAN_DIFF: f32 = -2.0;
 const MAX_WINGSPAN_DIFF: f32 = 11.0;
+
+const MIN_BMI: f32 = 21.33;
+const MAX_BMI: f32 = 32.0;
 
 pub struct PlayerGenerator {
     id_counter: u64,
@@ -73,7 +76,7 @@ impl PlayerGenerator {
         let normal = Normal::new(mean_bmi, std_dev).expect("Invalid BMI distribution");
         let mut rng = rand::rng();
         let bmi: f32 = normal.sample(&mut rng);
-        bmi.clamp(21.33, 32.0)
+        bmi.clamp(MIN_BMI, MAX_BMI)
     }
 
     fn random_weight(height_inches: f32) -> f32 {
@@ -98,7 +101,7 @@ impl PlayerGenerator {
             .expect("Invalid wingspan diff distribution");
         let mut rng = rand::rng();
         let wingspan_diff: f32 = normal.sample(&mut rng);
-        height_inches + wingspan_diff.clamp(-2.0, 11.0)
+        height_inches + wingspan_diff.clamp(MIN_WINGSPAN_DIFF, MAX_WINGSPAN_DIFF)
     }
 
     fn random_position() -> PlayerPosition {
