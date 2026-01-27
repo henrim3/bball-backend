@@ -91,6 +91,16 @@ impl PlayerGenerator {
         height.clamp(MIN_HEIGHT, MAX_HEIGHT)
     }
 
+    fn random_wingspan(height_inches: f32) -> f32 {
+        let mean_wingspan_diff = 5;
+        let std_dev = 2.0;
+        let normal = Normal::new(mean_wingspan_diff as f32, std_dev)
+            .expect("Invalid wingspan diff distribution");
+        let mut rng = rand::rng();
+        let wingspan_diff: f32 = normal.sample(&mut rng);
+        height_inches + wingspan_diff.clamp(-2.0, 11.0)
+    }
+
     fn random_position() -> PlayerPosition {
         let mut rng = rand::rng();
         [
@@ -118,8 +128,7 @@ impl PlayerGenerator {
 
         // Physicals
         let height_inches = Self::random_height(position);
-        let wingspan_diff = rand::random_range(MIN_WINGSPAN_DIFF..=MAX_WINGSPAN_DIFF); // TODO: use distribution
-        let wingspan_inches = height_inches + wingspan_diff;
+        let wingspan_inches = Self::random_wingspan(height_inches);
         let weight_lbs = Self::random_weight(height_inches);
 
         let city_state = &self.city_states[rand::random_range(0..self.city_states.len())];
