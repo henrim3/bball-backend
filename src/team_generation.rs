@@ -66,9 +66,9 @@ impl TeamGenerator {
         self.id_counter += 1;
 
         let team_name = self.random_team_name();
-        let abbreviated_name: String = team_name.chars().take(3).collect();
-        let abbreviated_name = abbreviated_name.to_uppercase();
         let city = self.random_city();
+        let abbreviated_name: String = city.city.chars().take(4).collect();
+        let abbreviated_name = abbreviated_name.to_uppercase();
 
         Team {
             id: id,
