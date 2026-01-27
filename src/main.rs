@@ -8,6 +8,6 @@ mod team;
 
 fn main() {
     let mut pg = PlayerGenerator::new();
-    let player = pg.generate_player(1);
+    let player = pg.generate_player();
     println!("{:?}", player);
 }

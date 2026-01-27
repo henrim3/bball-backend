@@ -16,6 +16,7 @@ const MIN_WEIGHT: u16 = 135;
 const MAX_WEIGHT: u16 = 310;
 
 pub struct PlayerGenerator {
+    id_counter: u64,
     first_names: Vec<String>,
     last_names: Vec<String>,
     city_states: Vec<CityState>,
@@ -30,6 +31,7 @@ struct CityState {
 impl PlayerGenerator {
     pub fn new() -> Self {
         Self {
+            id_counter: 0,
             first_names: Self::load_first_names(),
             last_names: Self::load_last_names(),
             city_states: Self::load_cities(),
@@ -83,7 +85,10 @@ impl PlayerGenerator {
         ((bmi as u32 * (height_inches as u32).pow(2)) / 703) as u16
     }
 
-    pub fn generate_player(&mut self, id: u64) -> Player {
+    pub fn generate_player(&mut self) -> Player {
+        let id = self.id_counter;
+        self.id_counter += 1;
+
         // Name
         let first_name = &self.first_names[rand::random_range(0..self.first_names.len())];
         let middle_name = &self.first_names[rand::random_range(0..self.first_names.len())];
