@@ -1,10 +1,11 @@
-use csv::{self, ReaderBuilder};
 use rand::{self, seq::IndexedRandom};
 use rand_distr::{Distribution, Normal, num_traits::Pow};
-use serde::Deserialize;
 use std::fs::read_to_string;
 
-use crate::player::{Player, PlayerPosition};
+use crate::{
+    city::City,
+    player::{Player, PlayerPosition},
+};
 
 const MIN_HEIGHT: f32 = 64.0;
 const MAX_HEIGHT: f32 = 91.0;
@@ -19,28 +20,22 @@ pub struct PlayerGenerator {
     id_counter: u64,
     first_names: Vec<String>,
     last_names: Vec<String>,
-    city_states: Vec<CityState>,
-}
-
-#[derive(Debug, Deserialize)]
-struct CityState {
-    city: String,
-    state_id: String,
+    cities: Vec<City>,
 }
 
 impl PlayerGenerator {
-    pub fn new() -> Self {
+    pub fn new(cities: Vec<City>) -> Self {
         Self {
             id_counter: 0,
             first_names: Self::load_first_names(),
             last_names: Self::load_last_names(),
-            city_states: Self::load_cities(),
+            cities: cities,
         }
     }
 
     fn load_first_names() -> Vec<String> {
         read_to_string("src/data/first_names.txt")
-            .expect("Failed to open last names file")
+            .expect("Failed to open first names file")
             .lines()
             .map(str::to_owned)
             .collect()
@@ -52,22 +47,6 @@ impl PlayerGenerator {
             .lines()
             .map(str::to_owned)
             .collect()
-    }
-
-    fn load_cities() -> Vec<CityState> {
-        let mut reader = ReaderBuilder::new()
-            .has_headers(true)
-            .from_path("src/data/us_cities/us_cities.csv")
-            .expect("Failed to read US cities file");
-
-        let mut result = Vec::new();
-
-        for record in reader.deserialize::<CityState>() {
-            let record = record.expect("Failed to read city/state record");
-            result.push(record);
-        }
-
-        result
     }
 
     fn random_bmi() -> f32 {
@@ -134,7 +113,7 @@ impl PlayerGenerator {
         let wingspan_inches = Self::random_wingspan(height_inches);
         let weight_lbs = Self::random_weight(height_inches);
 
-        let city_state = &self.city_states[rand::random_range(0..self.city_states.len())];
+        let city = &self.cities[rand::random_range(0..self.cities.len())];
 
         Player {
             id,
@@ -144,8 +123,8 @@ impl PlayerGenerator {
             last_name: last_name.to_string(),
             position: position,
             country: String::from("US"),
-            city: city_state.city.to_string(),
-            state: Some(city_state.state_id.to_string()),
+            city: city.city.to_string(),
+            state: Some(city.state_id.to_string()),
             height_inches,
             wingspan_inches,
             weight_lbs,

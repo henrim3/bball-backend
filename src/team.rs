@@ -9,6 +9,7 @@ pub struct Team {
     // Location
     pub country: String,
     pub city: String,
+    pub state: Option<String>,
 
     pub player_ids: Vec<u64>,
 }
