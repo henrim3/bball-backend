@@ -1,19 +1,16 @@
 use csv::{self, ReaderBuilder};
-use rand;
-use rand_distr::{Distribution, Normal};
+use rand::{self, seq::IndexedRandom};
+use rand_distr::{Distribution, Normal, num_traits::Pow};
 use serde::Deserialize;
 use std::fs::read_to_string;
 
 use crate::player::{Player, PlayerPosition};
 
-const MIN_HEIGHT: u8 = 64;
-const MAX_HEIGHT: u8 = 91;
+const MIN_HEIGHT: f32 = 64.0;
+const MAX_HEIGHT: f32 = 91.0;
 
-const MIN_WINGSPAN_DIFF: i8 = -1;
-const MAX_WINGSPAN_DIFF: i8 = 11;
-
-const MIN_WEIGHT: u16 = 135;
-const MAX_WEIGHT: u16 = 310;
+const MIN_WINGSPAN_DIFF: f32 = -1.0;
+const MAX_WINGSPAN_DIFF: f32 = 11.0;
 
 pub struct PlayerGenerator {
     id_counter: u64,
@@ -70,19 +67,42 @@ impl PlayerGenerator {
         result
     }
 
-    fn random_bmi() -> u8 {
+    fn random_bmi() -> f32 {
         let mean_bmi = 24.88;
         let std_dev = 2.0;
         let normal = Normal::new(mean_bmi, std_dev).expect("Invalid BMI distribution");
         let mut rng = rand::rng();
-        let bmi: f64 = normal.sample(&mut rng);
-        let bmi = bmi.clamp(21.33, 32.0).round();
-        bmi as u8
+        let bmi: f32 = normal.sample(&mut rng);
+        bmi.clamp(21.33, 32.0)
     }
 
-    fn random_weight(height_inches: u8) -> u16 {
+    fn random_weight(height_inches: f32) -> f32 {
         let bmi = Self::random_bmi();
-        ((bmi as u32 * (height_inches as u32).pow(2)) / 703) as u16
+        (bmi * (height_inches).pow(2)) / 703 as f32
+    }
+
+    fn random_height(position: PlayerPosition) -> f32 {
+        let mean_height_inches = position.mean_height_inches();
+        let std_dev = 2.0;
+        let normal =
+            Normal::new(mean_height_inches as f32, std_dev).expect("Invalid height distribution");
+        let mut rng = rand::rng();
+        let height: f32 = normal.sample(&mut rng);
+        height.clamp(MIN_HEIGHT, MAX_HEIGHT)
+    }
+
+    fn random_position() -> PlayerPosition {
+        let mut rng = rand::rng();
+        [
+            PlayerPosition::PG,
+            PlayerPosition::SG,
+            PlayerPosition::SF,
+            PlayerPosition::PF,
+            PlayerPosition::C,
+        ]
+        .choose(&mut rng)
+        .copied()
+        .expect("Invalid random position")
     }
 
     pub fn generate_player(&mut self) -> Player {
@@ -94,10 +114,12 @@ impl PlayerGenerator {
         let middle_name = &self.first_names[rand::random_range(0..self.first_names.len())];
         let last_name = &self.last_names[rand::random_range(0..self.last_names.len())];
 
+        let position = Self::random_position();
+
         // Physicals
-        let height_inches = rand::random_range(MIN_HEIGHT..=MAX_HEIGHT); // TODO: use distribution
+        let height_inches = Self::random_height(position);
         let wingspan_diff = rand::random_range(MIN_WINGSPAN_DIFF..=MAX_WINGSPAN_DIFF); // TODO: use distribution
-        let wingspan_inches = height_inches.saturating_add_signed(wingspan_diff);
+        let wingspan_inches = height_inches + wingspan_diff;
         let weight_lbs = Self::random_weight(height_inches);
 
         let city_state = &self.city_states[rand::random_range(0..self.city_states.len())];
@@ -108,7 +130,7 @@ impl PlayerGenerator {
             first_name: first_name.to_string(),
             middle_name: middle_name.to_string(),
             last_name: last_name.to_string(),
-            position: PlayerPosition::PG,
+            position: position,
             country: String::from("US"),
             city: city_state.city.to_string(),
             state: Some(city_state.state_id.to_string()),

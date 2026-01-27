@@ -1,10 +1,22 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum PlayerPosition {
     PG,
     SG,
     SF,
     PF,
     C,
+}
+
+impl PlayerPosition {
+    pub fn mean_height_inches(self) -> u8 {
+        match self {
+            PlayerPosition::PG => 75,
+            PlayerPosition::SG => 77,
+            PlayerPosition::SF => 79,
+            PlayerPosition::PF => 81,
+            PlayerPosition::C => 83,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -25,7 +37,7 @@ pub struct Player {
 
     // Measurements
     // TODO: move into separate class, add standing reach, vertical, etc.
-    pub height_inches: u8,
-    pub wingspan_inches: u8,
-    pub weight_lbs: u16,
+    pub height_inches: f32,
+    pub wingspan_inches: f32,
+    pub weight_lbs: f32,
 }
