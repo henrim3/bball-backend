@@ -1,5 +1,6 @@
 use csv::{self, ReaderBuilder};
 use rand;
+use rand_distr::{Distribution, Normal};
 use serde::Deserialize;
 use std::fs::read_to_string;
 
@@ -67,6 +68,21 @@ impl PlayerGenerator {
         result
     }
 
+    fn random_bmi() -> u8 {
+        let mean_bmi = 24.88;
+        let std_dev = 2.0;
+        let normal = Normal::new(mean_bmi, std_dev).expect("Invalid BMI distribution");
+        let mut rng = rand::rng();
+        let bmi: f64 = normal.sample(&mut rng);
+        let bmi = bmi.clamp(21.33, 32.0).round();
+        bmi as u8
+    }
+
+    fn random_weight(height_inches: u8) -> u16 {
+        let bmi = Self::random_bmi();
+        ((bmi as u32 * (height_inches as u32).pow(2)) / 703) as u16
+    }
+
     pub fn generate_player(&mut self, id: u64) -> Player {
         // Name
         let first_name = &self.first_names[rand::random_range(0..self.first_names.len())];
@@ -74,10 +90,10 @@ impl PlayerGenerator {
         let last_name = &self.last_names[rand::random_range(0..self.last_names.len())];
 
         // Physicals
-        let height_inches = rand::random_range(MIN_HEIGHT..=MAX_HEIGHT);
-        let wingspan_diff = rand::random_range(MIN_WINGSPAN_DIFF..=MAX_WINGSPAN_DIFF);
+        let height_inches = rand::random_range(MIN_HEIGHT..=MAX_HEIGHT); // TODO: use distribution
+        let wingspan_diff = rand::random_range(MIN_WINGSPAN_DIFF..=MAX_WINGSPAN_DIFF); // TODO: use distribution
         let wingspan_inches = height_inches.saturating_add_signed(wingspan_diff);
-        let weight_lbs = rand::random_range(MIN_WEIGHT..=MAX_WEIGHT);
+        let weight_lbs = Self::random_weight(height_inches);
 
         let city_state = &self.city_states[rand::random_range(0..self.city_states.len())];
 
