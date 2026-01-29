@@ -5,3 +5,14 @@ pub struct PlayerStats {
     pub assists: u32,
     pub rebounds: u32,
 }
+
+impl PlayerStats {
+    pub fn new() -> Self {
+        Self {
+            games_played: 0,
+            points: 0,
+            assists: 0,
+            rebounds: 0,
+        }
+    }
+}

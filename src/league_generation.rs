@@ -48,15 +48,7 @@ impl LeagueGenerator {
             team.player_ids = team_players.iter().map(|p| p.id).collect();
 
             for player in team_players {
-                player_stats.insert(
-                    player.id,
-                    PlayerStats {
-                        games_played: 0,
-                        points: 0,
-                        assists: 0,
-                        rebounds: 0,
-                    },
-                );
+                player_stats.insert(player.id, PlayerStats::new());
                 players.insert(player.id, player);
             }
 
