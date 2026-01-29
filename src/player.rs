@@ -1,5 +1,7 @@
 use strum_macros::EnumIter;
 
+use crate::{player_affinities::PlayerAffinities, player_attributes::PlayerAttributes};
+
 #[derive(Debug, Clone, Copy, EnumIter)]
 pub enum PlayerPosition {
     PG,
@@ -43,4 +45,7 @@ pub struct Player {
     pub height_inches: f32,
     pub wingspan_inches: f32,
     pub weight_lbs: f32,
+
+    pub affinities: PlayerAffinities,
+    pub attributes: PlayerAttributes,
 }

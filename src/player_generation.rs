@@ -5,6 +5,9 @@ use std::fs::read_to_string;
 use crate::{
     city::City,
     player::{Player, PlayerPosition},
+    player_affinities::PlayerAffinities,
+    player_attributes::PlayerAttributes,
+    random::random_u8,
 };
 
 const MIN_HEIGHT: f32 = 64.0;
@@ -97,38 +100,40 @@ impl PlayerGenerator {
         .expect("Invalid random position")
     }
 
-    pub fn generate_player(&mut self) -> Player {
-        let id = self.id_counter;
-        self.id_counter += 1;
-
-        // Name
-        let first_name = &self.first_names[rand::random_range(0..self.first_names.len())];
-        let middle_name = &self.first_names[rand::random_range(0..self.first_names.len())];
-        let last_name = &self.last_names[rand::random_range(0..self.last_names.len())];
-
-        let position = Self::random_position();
-
-        // Physicals
-        let height_inches = Self::random_height(position);
-        let wingspan_inches = Self::random_wingspan(height_inches);
-        let weight_lbs = Self::random_weight(height_inches);
-
-        let city = &self.cities[rand::random_range(0..self.cities.len())];
-
-        Player {
-            id,
-            team_id: None,
-            first_name: first_name.to_string(),
-            middle_name: middle_name.to_string(),
-            last_name: last_name.to_string(),
-            position: position,
-            country: String::from("US"),
-            city: city.city.to_string(),
-            state: Some(city.state_id.to_string()),
-            height_inches,
-            wingspan_inches,
-            weight_lbs,
+    fn random_affinities() -> PlayerAffinities {
+        PlayerAffinities {
+            finishing: random_u8(),
+            shooting: random_u8(),
+            strength: random_u8(),
+            speed: random_u8(),
+            jumping: random_u8(),
+            instincts: random_u8(),
+            fluidity: random_u8(),
         }
+    }
+
+    fn random_attributes() -> PlayerAttributes {
+        PlayerAttributes {
+            finishing_touch: random_u8(),
+            shooting_touch: random_u8(),
+            moving_footwork: random_u8(),
+            standing_footwork: random_u8(),
+            moving_jump: random_u8(),
+            standing_jump: random_u8(),
+            sprint_speed: random_u8(),
+            lateral_speed: random_u8(),
+            upper_body_strength: random_u8(),
+            core_strength: random_u8(),
+            lower_body_strength: random_u8(),
+            reaction_speed: random_u8(),
+            offensive_instincts: random_u8(),
+            defensive_instincts: random_u8(),
+        }
+    }
+
+    pub fn generate_player(&mut self) -> Player {
+        let position = Self::random_position();
+        self.generate_player_by_position(position)
     }
 
     pub fn generate_player_by_position(&mut self, position: PlayerPosition) -> Player {
@@ -147,6 +152,9 @@ impl PlayerGenerator {
 
         let city = &self.cities[rand::random_range(0..self.cities.len())];
 
+        let affinities = Self::random_affinities();
+        let attributes = Self::random_attributes();
+
         Player {
             id,
             team_id: None,
@@ -160,6 +168,8 @@ impl PlayerGenerator {
             height_inches,
             wingspan_inches,
             weight_lbs,
+            attributes: attributes,
+            affinities: affinities,
         }
     }
 }
