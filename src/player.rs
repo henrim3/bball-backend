@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy)]
+use strum_macros::EnumIter;
+
+#[derive(Debug, Clone, Copy, EnumIter)]
 pub enum PlayerPosition {
     PG,
     SG,

@@ -130,4 +130,36 @@ impl PlayerGenerator {
             weight_lbs,
         }
     }
+
+    pub fn generate_player_by_position(&mut self, position: PlayerPosition) -> Player {
+        let id = self.id_counter;
+        self.id_counter += 1;
+
+        // Name
+        let first_name = &self.first_names[rand::random_range(0..self.first_names.len())];
+        let middle_name = &self.first_names[rand::random_range(0..self.first_names.len())];
+        let last_name = &self.last_names[rand::random_range(0..self.last_names.len())];
+
+        // Physicals
+        let height_inches = Self::random_height(position);
+        let wingspan_inches = Self::random_wingspan(height_inches);
+        let weight_lbs = Self::random_weight(height_inches);
+
+        let city = &self.cities[rand::random_range(0..self.cities.len())];
+
+        Player {
+            id,
+            team_id: None,
+            first_name: first_name.to_string(),
+            middle_name: middle_name.to_string(),
+            last_name: last_name.to_string(),
+            position: position,
+            country: String::from("US"),
+            city: city.city.to_string(),
+            state: Some(city.state_id.to_string()),
+            height_inches,
+            wingspan_inches,
+            weight_lbs,
+        }
+    }
 }

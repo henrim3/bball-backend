@@ -1,8 +1,15 @@
 use std::collections::HashMap;
 
+use strum::IntoEnumIterator;
+
 use crate::{
-    city::load_cities, league::League, player::Player, player_generation::PlayerGenerator,
-    player_stats::PlayerStats, team::Team, team_generation::TeamGenerator,
+    city::load_cities,
+    league::League,
+    player::{Player, PlayerPosition},
+    player_generation::PlayerGenerator,
+    player_stats::PlayerStats,
+    team::Team,
+    team_generation::TeamGenerator,
 };
 
 pub struct LeagueGenerator {
@@ -21,8 +28,10 @@ impl LeagueGenerator {
 
     fn generate_team_players(&mut self) -> Vec<Player> {
         let mut players: Vec<Player> = vec![];
-        for _ in 0..15 {
-            players.push(self.player_generator.generate_player());
+        for position in PlayerPosition::iter() {
+            for _ in 0..3 {
+                players.push(self.player_generator.generate_player_by_position(position));
+            }
         }
         players
     }

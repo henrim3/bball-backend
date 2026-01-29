@@ -1,7 +1,4 @@
-use crate::city::{City, load_cities};
 use crate::league_generation::LeagueGenerator;
-use crate::player_generation::PlayerGenerator;
-use crate::team_generation::TeamGenerator;
 
 mod city;
 mod league;
@@ -15,5 +12,7 @@ mod team_generation;
 fn main() {
     let mut league_generator = LeagueGenerator::new();
     let league = league_generator.generate_league(1);
-    println!("{:?}", league);
+    for player in league.players.values() {
+        println!("{:?}", player.position);
+    }
 }
